@@ -1,4 +1,4 @@
-**FKRBlockDrawing** is a collection of two classes and one category to make drawing **artwork in code** a lot easier.  
+**FKRBlockDrawing** is a collection of two classes and one category to make creating **artwork in code** a lot easier.  
 It's great in conjunction with [PaintCode](http://paintcodeapp.com "PaintCode"), where the graphics in the examples project are from.
 
 - - - - -
