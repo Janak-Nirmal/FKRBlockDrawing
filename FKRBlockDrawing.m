@@ -92,13 +92,13 @@
     
     UIGraphicsBeginImageContextWithOptions(size, opaque, scale);
     CGContextRef context = UIGraphicsGetCurrentContext();
-	
-    UIGraphicsPushContext(context);
-	renderBlock(context, size);
-	UIGraphicsPopContext();
     
-	UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
-	UIGraphicsEndImageContext();
+    UIGraphicsPushContext(context);
+    renderBlock(context, size);
+    UIGraphicsPopContext();
+    
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
     
     return image;
 }
