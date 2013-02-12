@@ -173,6 +173,10 @@
         
         if ([layer isKindOfClass:[FKRBlockDrawingLayer class]]) {
             self.renderBlock = [(FKRBlockDrawingLayer *)layer renderBlock];
+        } else {
+            self.renderBlock = ^(CGContextRef context, CGSize size) {
+                
+            };
         }
     }
     
