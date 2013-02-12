@@ -77,18 +77,53 @@
  UIImage+FKRBlockDrawing
 */
 
+static NSCache *kUIImageFKRBlockDrawingCache = nil;
+static const NSUInteger kUIImageFKRBlockDrawingCacheMaximumCostLimit = 10 * 1024 * 1024; // 10 megabytes
+
+NSCache *UIImageFKRBlockDrawingCache() {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        kUIImageFKRBlockDrawingCache = [[NSCache alloc] init];
+        [kUIImageFKRBlockDrawingCache setName:@"UIImage+FKRBlockDrawing Cache"];
+        [kUIImageFKRBlockDrawingCache setTotalCostLimit:kUIImageFKRBlockDrawingCacheMaximumCostLimit];
+        
+        [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationDidReceiveMemoryWarningNotification object:nil queue:[NSOperationQueue mainQueue] usingBlock:^(NSNotification *note) {
+            [kUIImageFKRBlockDrawingCache removeAllObjects];
+        }];
+    });
+    
+    return kUIImageFKRBlockDrawingCache;
+}
+
 @implementation UIImage (FKRBlockDrawing)
 
 + (instancetype)imageWithRenderBlock:(FKRBlockDrawingRenderBlock)renderBlock size:(CGSize)size
 {
-    return [self imageWithRenderBlock:renderBlock size:size opaque:NO scale:0];
+    return [self imageWithRenderBlock:renderBlock size:size identifier:nil opaque:NO scale:0];
 }
 
 + (instancetype)imageWithRenderBlock:(FKRBlockDrawingRenderBlock)renderBlock size:(CGSize)size opaque:(BOOL)opaque scale:(CGFloat)scale
 {
+    return [self imageWithRenderBlock:renderBlock size:size identifier:nil opaque:opaque scale:scale];
+}
+
++ (instancetype)imageWithRenderBlock:(FKRBlockDrawingRenderBlock)renderBlock size:(CGSize)size identifier:(NSString *)identifier
+{
+    return [self imageWithRenderBlock:renderBlock size:size identifier:identifier opaque:NO scale:0];
+}
+
++ (instancetype)imageWithRenderBlock:(FKRBlockDrawingRenderBlock)renderBlock size:(CGSize)size identifier:(NSString *)identifier opaque:(BOOL)opaque scale:(CGFloat)scale
+{
     NSParameterAssert(renderBlock != NULL);
     NSParameterAssert(size.width >= 0 && size.width <= 1024 && size.height >= 0 && size.height <= 1024);
     NSParameterAssert(scale >= 0);
+    
+    if (identifier.length > 0) {
+        UIImage *cachedImage = [UIImageFKRBlockDrawingCache() objectForKey:identifier];
+        if (cachedImage != nil) {
+            return cachedImage;
+        }
+    }
     
     UIGraphicsBeginImageContextWithOptions(size, opaque, scale);
     CGContextRef context = UIGraphicsGetCurrentContext();
@@ -99,6 +134,10 @@
     
     UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
+    
+    if (image != nil && identifier.length > 0) {
+        [UIImageFKRBlockDrawingCache() setObject:image forKey:identifier cost:size.width * size.height * 4];
+    }
     
     return image;
 }
