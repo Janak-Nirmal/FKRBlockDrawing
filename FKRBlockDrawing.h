@@ -49,7 +49,7 @@ typedef void(^FKRBlockDrawingRenderBlock)(CGContextRef context, CGSize size);
 /*
  Caching:
  You can use these methods to get a cached version of the rendered image whenever possible. You should include information about the required size, opaqueness and scale in the identifier, if required.
- The cache of is automatically cleared when a UIApplicationDidReceiveMemoryWarningNotification is posted. The maximum size of the cache is roughly about 10 megabytes.
+ The cache is automatically cleared when a UIApplicationDidReceiveMemoryWarningNotification is posted. The maximum size of the cache is roughly about 10 megabytes.
 */
 
 // The same as +imageWithRenderBlock:size:, but the rendered image is cached and that cached image is returned whenever possible.
