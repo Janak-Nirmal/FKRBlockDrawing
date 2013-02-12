@@ -87,7 +87,7 @@
 + (instancetype)imageWithRenderBlock:(FKRBlockDrawingRenderBlock)renderBlock size:(CGSize)size opaque:(BOOL)opaque scale:(CGFloat)scale
 {
     NSParameterAssert(renderBlock != NULL);
-    NSParameterAssert(size.width <= 1024 && size.height <= 1024);
+    NSParameterAssert(size.width >= 0 && size.width <= 1024 && size.height >= 0 && size.height <= 1024);
     NSParameterAssert(scale >= 0);
     
     UIGraphicsBeginImageContextWithOptions(size, opaque, scale);
